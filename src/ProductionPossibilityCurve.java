@@ -10,7 +10,8 @@ public class ProductionPossibilityCurve extends JPanel {
     private List<Point> points;
     private String xAxisLabel;
     private String yAxisLabel;
-    private double slopeRatio;
+    private static int con;
+    private static int cap;
 
     public ProductionPossibilityCurve(String xAxisLabel, String yAxisLabel) {
         points = new ArrayList<>();
@@ -30,10 +31,11 @@ public class ProductionPossibilityCurve extends JPanel {
         // Set up the coordinate system
         int width = getWidth();
         int height = getHeight();
-        System.out.println(width + " " + height);
         int xCenter = width / 2;
         int yCenter = height / 2;
-        // ((Graphics2D) g).setStroke(new BasicStroke(width));
+
+        int thickness = 7;
+         ((Graphics2D) g).setStroke(new BasicStroke(thickness));
         //Draw the vertical line
         g.setColor(Color.DARK_GRAY);
         g.drawLine(width / 2 ,0, width/2 , height / 2);
@@ -50,27 +52,19 @@ public class ProductionPossibilityCurve extends JPanel {
         for (Point point : points) {
             int x = xCenter + point.x;
             int y = yCenter - point.y;
-            g.fillOval(x - 2, y - 2, 4, 4);
+            ((Graphics2D) g).setStroke(new BasicStroke(thickness));
+            g.fillOval(x - 2, y - 2, 10, 10);
         }
 
         // Draw the slope
-        int y2 = (int) (slopeRatio * width);
-        g.drawLine(0, height, width, y2);
-       /* if (points.size() >= 2) {
-            g.setColor(Color.DARK_GRAY);
-            Point p1 = points.get(0);
-            Point p2 = points.get(1);
-            double slope = (double) (p2.y - p1.y) / (p2.x - p1.x);
-            double angle = Math.atan(slope);
+        g.setColor(Color.DARK_GRAY);
+        ((Graphics2D) g).setStroke(new BasicStroke(4));
+        //int y2 = (int) ((width/2)-(slopeRatio * (350-width/2)));
+        g.drawLine(width,cap/2,con/2, 0);
+        //g.drawArc(width/2,height/2,300,300,0,90);
+        //g.drawLine(width,height/2,width/2,0);
 
-            int radius = Math.min(width, height) / 4;
-            int arcX = xCenter - radius;
-            int arcY = yCenter - radius;
-            int arcWidth = radius * 2;
-            int arcHeight = radius * 2;
 
-            g.drawArc(arcX, arcY, arcWidth, arcHeight, 0, (int) Math.toDegrees(angle));
-        }*/
 
     }
 
@@ -79,21 +73,16 @@ public class ProductionPossibilityCurve extends JPanel {
         frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         frame.setSize(500, 500);
         Scanner scanner = new Scanner(System.in);
-        //GraphPlotter graphPanel = new GraphPlotter();
-
-        System.out.print("Enter x-axis label: ");
-        String xAxisLabel = scanner.nextLine();
-
-        System.out.print("Enter y-axis label: ");
-        String yAxisLabel = scanner.nextLine();
-
-       /* System.out.println("What is the ratio between consumer goods and capital goods(type y/x)");
-        double ratio = Double.parseDouble(scanner.nextLine());*/
-        //graphPanel.setSlopeRatio(ratio);
-
-
+        //label axis
+        String xAxisLabel= JOptionPane.showInputDialog("Label x:");
+        String yAxisLabel= JOptionPane.showInputDialog("Label y:");
         ProductionPossibilityCurve graphPanel = new ProductionPossibilityCurve(xAxisLabel, yAxisLabel);
-
+        //get slope
+        String slope = JOptionPane.showInputDialog("During a normal economic time what's the max production of consumer goods?");
+         con = Integer.parseInt(slope);
+        String s = JOptionPane.showInputDialog("Max production of consumer goods?");
+         cap = Integer.parseInt(s);
+        //get coordinates
         while (true) {
             System.out.print("Enter coordinates (x, y) separated by spaces (or press enter to finish): ");
             String input = scanner.nextLine();
@@ -106,7 +95,6 @@ public class ProductionPossibilityCurve extends JPanel {
                 System.out.println("Invalid input! Please enter coordinates in the format 'x y'.");
                 continue;
             }
-
             try {
                 int x = Integer.parseInt(parts[0]);
                 int y = Integer.parseInt(parts[1]);
