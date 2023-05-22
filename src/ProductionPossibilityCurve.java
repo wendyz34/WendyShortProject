@@ -24,10 +24,10 @@ public class ProductionPossibilityCurve extends JPanel {
     }
 
     @Override
-    protected void paintComponent(Graphics g) {
-        g.setColor(Color.darkGray);
+    public void paintComponent(Graphics g) {
         g.fillRect(0, 0, getWidth(), getHeight());
         super.paintComponent(g);
+        this.setBackground(Color.WHITE);
         // Set up the coordinate system
         int width = getWidth();
         int height = getHeight();
@@ -37,7 +37,7 @@ public class ProductionPossibilityCurve extends JPanel {
         int thickness = 7;
          ((Graphics2D) g).setStroke(new BasicStroke(thickness));
         //Draw the vertical line
-        g.setColor(Color.DARK_GRAY);
+        g.setColor(Color.darkGray);
         g.drawLine(width / 2 ,0, width/2 , height / 2);
         // Draw the horizontal line
         g.drawLine(width/2, height/2, width,height/2);
@@ -60,7 +60,7 @@ public class ProductionPossibilityCurve extends JPanel {
         g.setColor(Color.DARK_GRAY);
         ((Graphics2D) g).setStroke(new BasicStroke(4));
         //int y2 = (int) ((width/2)-(slopeRatio * (350-width/2)));
-        g.drawLine(width,cap/2,con/2, 0);
+        g.drawLine(width/2,cap/2,con/2, 0);
         //g.drawArc(width/2,height/2,300,300,0,90);
         //g.drawLine(width,height/2,width/2,0);
 
