@@ -1,6 +1,6 @@
 import javax.swing.*;
 import java.awt.*;
-import java.awt.event.ActionListener;
+import java.awt.event.*;
 import java.awt.geom.*;
 import java.util.ArrayList;
 import java.util.List;
@@ -14,80 +14,121 @@ public class ProductionPossibilityCurve extends JPanel{
     private String yAxisLabel;
     private static int con;
     private static int cap;
-    private boolean ovalClicked;
 
     public ProductionPossibilityCurve(String xAxisLabel, String yAxisLabel) {
         points = new ArrayList<>();
         this.xAxisLabel = xAxisLabel;
         this.yAxisLabel = yAxisLabel;
+
+        addMouseListener(new MouseAdapter() {
+            @Override
+            public void mousePressed(MouseEvent e) {
+                Point clickedPoint = getClickedPoint(e.getX(), e.getY());
+                if (clickedPoint != null) {
+                    handlePointClick(clickedPoint);
+                }
+            }
+        });
     }
     public void addPoint(int x, int y) {
         points.add(new Point(x, y));
     }
-
-    @Override
-    protected void paintComponent(Graphics g) {
-        g.setColor(Color.darkGray);
-        g.fillRect(0, 0, getWidth(), getHeight());
-        super.paintComponent(g);
-        // Set up the coordinate system
+    private Point getClickedPoint(int x, int y) {
         int width = getWidth();
         int height = getHeight();
-        int xCenter = width/2;
-        int yCenter = height/2;
-        int thickness = 7;
-         ((Graphics2D) g).setStroke(new BasicStroke(thickness));
-        //Draw the vertical line
-        g.setColor(Color.DARK_GRAY);
-        g.drawLine(width / 2 ,0, width/2 , height / 2);
-        // Draw the horizontal line
-        g.drawLine(width/2, height/2, width,height/2);
-        // Draw the x and y axis labels
-        g.drawString(xAxisLabel, 250, 300);
-        g.drawString(yAxisLabel, 100, 100);
+        int xCenter = width / 2;
+        int yCenter = height / 2;
 
-        // Plot the user-provided points
-        g.setColor(Color.RED);
         for (Point point : points) {
-            int x = xCenter + point.x;
-            int y = yCenter - point.y;
-            ((Graphics2D) g).setStroke(new BasicStroke(thickness));
-           g.fillOval(x - 2, y - 2, 10, 10);
+            int pointX = xCenter + point.x;
+            int pointY = yCenter - point.y;
+
+            if (Math.abs(pointX - x) <= 5 && Math.abs(pointY - y) <= 5) {
+                return point;
+            }
         }
 
-        // Draw the slope
-        g.setColor(Color.DARK_GRAY);
-        ((Graphics2D) g).setStroke(new BasicStroke(4));
-        g.drawLine(width, con/2, cap/2,0);
-        //g.drawArc(0,con/2,500,500,0,90);
-        g.drawArc(cap/2,0,400,400,0,90);
-       // g.drawArc();
-
-
-
+        return null;
     }
-    public void mousePressed(MouseEvent e){
 
+    private void handlePointClick(Point clickedPoint) {
+        int x = clickedPoint.x;
+        int y = clickedPoint.y;
+        double ratio = (double)y/x;
+        String message = " ";
+
+        /*if (Math.abs((double) y / x - ratio) < 0.001) {
+            message = "Coordinate on the PPC.";
+        } else if ((double) y / x < ratio) {
+            message = "Area probably in a recession.";
+        } else if ((double) y / x > ratio) {
+            message = "Production more than usual. Technological advancement.";
+        }*/
+
+        JOptionPane.showMessageDialog(this, "Clicked point: (" + x + ", " + y + ") " + message);
     }
+
+
+        @Override
+        protected void paintComponent(Graphics g) {
+            g.setColor(Color.darkGray);
+            g.fillRect(0, 0, getWidth(), getHeight());
+            super.paintComponent(g);
+
+            int width = getWidth();
+            int height = getHeight();
+            int xCenter = width / 2;
+            int yCenter = height / 2;
+
+            // Draw the vertical line
+            g.setColor(Color.DARK_GRAY);
+            g.drawLine(xCenter, 0, xCenter, height / 2);
+
+            // Draw the horizontal line
+            g.drawLine(xCenter, height / 2, width, height / 2);
+
+            // Draw the x and y axis labels
+            g.drawString(xAxisLabel, width - 70, height / 2 - 10);
+            g.drawString(yAxisLabel, xCenter + 10, 20);
+
+            // Plot the user-provided points
+            g.setColor(Color.RED);
+            for (Point point : points) {
+                int x = xCenter + point.x;
+                int y = yCenter - point.y;
+                g.fillOval(x - 2, y - 2, 10, 10);
+            }
+
+            // Draw the arc
+            int arcStartX = xCenter - cap;
+            int arcStartY = yCenter - con;
+            int arcWidth = cap * 2;
+            int arcHeight = con * 2;
+
+            g.drawArc(arcStartX, arcStartY, arcWidth, arcHeight, 0, 90);
+        }
+
 
     public static void main(String[] args) {
         JFrame frame = new JFrame("Production Possibility Curve");
         frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-        frame.setSize(550, 550);
+        frame.setSize(550,550);
         Scanner scanner = new Scanner(System.in);
-        //label axis
+        //Label axis
         //coordinates only show within 250?
         String xAxisLabel= JOptionPane.showInputDialog("Label x:");
         String yAxisLabel= JOptionPane.showInputDialog("Label y:");
         ProductionPossibilityCurve graphPanel = new ProductionPossibilityCurve(xAxisLabel, yAxisLabel);
-        //get slope
+        //Get slope
         //max production only show within 500
         String slope = JOptionPane.showInputDialog("During a normal economic time what's the max production of consumer goods?");
-         con = Integer.parseInt(slope);
+        con = Integer.parseInt(slope);
         String s = JOptionPane.showInputDialog("Max production of consumer goods?");
-         cap = Integer.parseInt(s);
+        cap = Integer.parseInt(s);
         //get coordinates
         while (true) {
+            /*System.out.println("Enter coordinates (x, y) separated by spaces (or press enter to finish): ");
+            String input = scanner.nextLine();*/
             String input = JOptionPane.showInputDialog("Enter coordinates (x, y) separated by spaces (or press enter to finish): ");
             if (input.isEmpty()) {
                 break;
@@ -114,4 +155,3 @@ public class ProductionPossibilityCurve extends JPanel{
         //scanner.close();
     }
 }
-
