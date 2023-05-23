@@ -1,7 +1,6 @@
 import javax.swing.*;
 import java.awt.*;
 import java.awt.event.*;
-import java.awt.geom.*;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Scanner;
@@ -19,7 +18,7 @@ public class ProductionPossibilityCurve extends JPanel{
         points = new ArrayList<>();
         this.xAxisLabel = xAxisLabel;
         this.yAxisLabel = yAxisLabel;
-
+        //Makes the coordinates a clickable point
         addMouseListener(new MouseAdapter() {
             @Override
             public void mousePressed(MouseEvent e) {
@@ -30,6 +29,7 @@ public class ProductionPossibilityCurve extends JPanel{
             }
         });
     }
+    //Adds points to list
     public void addPoint(int x, int y) {
         points.add(new Point(x, y));
     }
@@ -51,62 +51,71 @@ public class ProductionPossibilityCurve extends JPanel{
         return null;
     }
 
+
     private void handlePointClick(Point clickedPoint) {
         int x = clickedPoint.x;
         int y = clickedPoint.y;
-        double ratio = (double)y/x;
-        String message = " ";
-
-        /*if (Math.abs((double) y / x - ratio) < 0.001) {
-            message = "Coordinate on the PPC.";
-        } else if ((double) y / x < ratio) {
-            message = "Area probably in a recession.";
-        } else if ((double) y / x > ratio) {
-            message = "Production more than usual. Technological advancement.";
-        }*/
+        int width = getWidth();
+        int height = getHeight();
+        int xCenter = width / 2;
+        int yCenter = height / 2;
+        double radius = Math.sqrt(x*x+y*y);
+        String message = "";
+        if ((x - xCenter) * (x - xCenter) +
+                (y - yCenter) * (y - yCenter) > radius * radius) {
+            message = "Below the curve, might be in a recession";
+        }else if ((x - xCenter) * (x - xCenter) +
+                (y - yCenter) * (y - yCenter) < radius * radius){
+            message = "Above the curve, technological advancement";
+        }else{
+            message = "On the curve, normal production";
+        }
+        if((x==cap)&&(y==0)||(y==con)&&(x==0)){
+            message = "On the curve, normal production";
+        }
 
         JOptionPane.showMessageDialog(this, "Clicked point: (" + x + ", " + y + ") " + message);
     }
 
 
-        @Override
-        protected void paintComponent(Graphics g) {
-            g.setColor(Color.darkGray);
-            g.fillRect(0, 0, getWidth(), getHeight());
-            super.paintComponent(g);
+    @Override
+    protected void paintComponent(Graphics g) {
+        g.setColor(Color.darkGray);
+        g.fillRect(0, 0, getWidth(), getHeight());
+        super.paintComponent(g);
 
-            int width = getWidth();
-            int height = getHeight();
-            int xCenter = width / 2;
-            int yCenter = height / 2;
+        int width = getWidth();
+        int height = getHeight();
+        int xCenter = width / 2;
+        int yCenter = height / 2;
 
-            // Draw the vertical line
-            g.setColor(Color.DARK_GRAY);
-            g.drawLine(xCenter, 0, xCenter, height / 2);
+        // Draw the vertical line
+        g.setColor(Color.DARK_GRAY);
+        g.drawLine(xCenter, 0, xCenter, height / 2);
 
-            // Draw the horizontal line
-            g.drawLine(xCenter, height / 2, width, height / 2);
+        // Draw the horizontal line
+        g.drawLine(xCenter, height / 2, width, height / 2);
 
-            // Draw the x and y axis labels
-            g.drawString(xAxisLabel, width - 70, height / 2 - 10);
-            g.drawString(yAxisLabel, xCenter + 10, 20);
+        // Draw the x and y axis labels
+        g.drawString(xAxisLabel, width - 70, height / 2 - 10);
+        g.drawString(yAxisLabel, xCenter + 10, 20);
 
-            // Plot the user-provided points
-            g.setColor(Color.RED);
-            for (Point point : points) {
-                int x = xCenter + point.x;
-                int y = yCenter - point.y;
-                g.fillOval(x - 2, y - 2, 10, 10);
-            }
-
-            // Draw the arc
-            int arcStartX = xCenter - cap;
-            int arcStartY = yCenter - con;
-            int arcWidth = cap * 2;
-            int arcHeight = con * 2;
-
-            g.drawArc(arcStartX, arcStartY, arcWidth, arcHeight, 0, 90);
+        // Plot the user-provided points
+        g.setColor(Color.RED);
+        for (Point point : points) {
+            int x = xCenter + point.x;
+            int y = yCenter - point.y;
+            g.fillOval(x - 2, y - 2, 10, 10);
         }
+
+        // Draw the arc
+        int arcStartX = xCenter - cap;
+        int arcStartY = yCenter - con;
+        int arcWidth = cap * 2;
+        int arcHeight = con * 2;
+
+        g.drawArc(arcStartX, arcStartY, arcWidth, arcHeight, 0, 90);
+    }
 
 
     public static void main(String[] args) {
@@ -120,7 +129,7 @@ public class ProductionPossibilityCurve extends JPanel{
         String yAxisLabel= JOptionPane.showInputDialog("Label y:");
         ProductionPossibilityCurve graphPanel = new ProductionPossibilityCurve(xAxisLabel, yAxisLabel);
         //Get slope
-        //max production only show within 500
+        //max production only show within 500 or 250?
         String slope = JOptionPane.showInputDialog("During a normal economic time what's the max production of consumer goods?");
         con = Integer.parseInt(slope);
         String s = JOptionPane.showInputDialog("Max production of consumer goods?");
